@@ -4,7 +4,7 @@ var http = require('http').createServer(app);
 
 
 
-const PORT = process.send.PORT||8900;
+const PORT = process.env.PORT||8900;
 
 const io=require('socket.io')(http,{
     cors:{
