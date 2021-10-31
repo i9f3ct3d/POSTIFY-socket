@@ -1,6 +1,12 @@
 require("dotenv").config();
+var app = require('express')();
+var http = require('http').createServer(app);
 
-const io=require('socket.io')(process.env.PORT||8900,{
+
+
+const PORT = process.send.port || 8900;
+
+const io=require('socket.io')(http,{
     cors:{
         origin:process.env.REACT_APP_URL,
     }
@@ -9,9 +15,6 @@ const io=require('socket.io')(process.env.PORT||8900,{
 let users = [];
 
 const addUsersWithSocketId=(userId , socketId)=>{
-
-    // !users.some((user) => user.userId === userId) &&
-    // users.push({ userId, socketId });
 
     let flag  = true;
 
@@ -65,4 +68,8 @@ io.on("connection", (socket) => {
         io.emit("getOnlineUsers" , users);
     });
     
+})
+
+http.listen(PORT,()=>{
+    console.log(`listening to ${PORT}`);
 })
