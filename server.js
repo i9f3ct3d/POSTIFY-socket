@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const io=require('socket.io')(process.send.PORT||8900,{
+const io=require('socket.io')(process.env.PORT||8900,{
     cors:{
         origin:process.env.REACT_APP_URL,
     }
