@@ -15,7 +15,7 @@ const io=require('socket.io')(http,{
 let users = [];
 
 const addUsersWithSocketId=(userId , socketId)=>{
-
+    
     let flag  = true;
 
     users.forEach(user => {
@@ -42,7 +42,7 @@ const getUser =(userId)=>{
 
 io.on("connection", (socket) => {
     console.log("user connected to socket");
-    io.emit("welcome" , "this is socket bitch");
+    io.emit("welcome" , "this is socket");
 
     socket.on("addUser" , myUserid=>{
 
@@ -58,6 +58,8 @@ io.on("connection", (socket) => {
             senderId : data.senderId,
             chatContent : data.chatContent,
             conversationId : data.conversationId,
+            customChatid : data.customChatid,
+            isSeen : data.isSeen,
         })
 
     })
