@@ -15,18 +15,8 @@ const io=require('socket.io')(http,{
 let users = [];
 
 const addUsersWithSocketId=(userId , socketId)=>{
-    
-    let flag  = true;
 
-    users.forEach(user => {
-        
-        if(user.userId === userId){
-            flag = false;
-        }
-
-    });
-
-    flag && users.push({userId , socketId});
+    !users.some((user) => user.userId === userId) && users.push({ userId, socketId });
 
 }
 
@@ -40,6 +30,11 @@ const getUser =(userId)=>{
     return users.find((user) => user.userId === userId);
 }
 
+const getUserBySocketId =(socketId)=>{
+
+    return users.find((user) => user.socketId === socketId);
+}
+
 io.on("connection", (socket) => {
     console.log("user connected to socket");
     io.emit("welcome" , "this is socket");
@@ -47,27 +42,30 @@ io.on("connection", (socket) => {
     socket.on("addUser" , myUserid=>{
 
         addUsersWithSocketId(myUserid , socket.id);
-        io.emit("getOnlineUsers" , users);
+        io.to(socket.id).emit('getAllOnlineUsers' , users);
+        socket.broadcast.emit("getRecentOnlineUser" , {userId : myUserid , socketId : socket.id});
         
     })
 
     socket.on("sendMessage" , (data)=>{
 
-        io.to(getUser(data.recieverId).socketId).emit("getMessage" ,{
+        const user = getUser(data.recieverId);
+        io.to(user.socketId).emit("getMessage" ,{
             recieverId : data.recieverId,
             senderId : data.senderId,
             chatContent : data.chatContent,
             conversationId : data.conversationId,
             customChatid : data.customChatid,
             isSeen : data.isSeen,
+            date : new Date()
         })
 
     })
     
     socket.on("disconnect" , ()=>{
         console.log("User disconnected");
+        io.emit("recentOfflineUser" , getUserBySocketId(socket.id));
         removeUser(socket.id);
-        io.emit("getOnlineUsers" , users);
     });
     
 })
